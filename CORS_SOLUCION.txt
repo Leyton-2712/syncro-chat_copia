@@ -1,0 +1,165 @@
+╔════════════════════════════════════════════════════════════════════════════════╗
+║                         SOLUCIÓN DE ERROR CORS                                 ║
+║              "The given origin is not allowed for the given client ID"         ║
+╚════════════════════════════════════════════════════════════════════════════════╝
+
+��� PROBLEMA QUE TENÍAS
+──────────────────────────────────────────────────────────────────────────────────
+
+Error: Cross-Origin-Opener-Policy policy would block the window.postMessage call.
+Error: Access to fetch blocked by CORS policy
+Error: The given origin is not allowed for the given client ID.
+
+CAUSA: El backend NO tenía CORS configurado correctamente para aceptar requests 
+desde http://localhost:5173 (tu frontend)
+
+═════════════════════════════════════════════════════════════════════════════════
+✅ LO QUE ARREGLÉ
+═════════════════════════════════════════════════════════════════════════════════
+
+1️⃣  INSTALÉ CORS EN BACKEND
+    ├─ npm install cors (ya estaba)
+    └─ npm install --save-dev @types/cors
+
+2️⃣  CONFIGURÉ CORS EN backend/src/index.ts
+    ├─ import cors from "cors"
+    ├─ app.use(cors({
+    │   origin: ["http://localhost:3000", "http://localhost:5173", "http://localhost:5174"],
+    │   methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
+    │   credentials: true,
+    │   allowedHeaders: ["Content-Type", "Authorization"]
+    │ }))
+    └─ ✅ Ahora backend acepta requests desde frontend
+
+3️⃣  ACTUALICÉ SOCKET.IO CORS
+    └─ cors: {
+       origin: ["http://localhost:3000", "http://localhost:5173", "http://localhost:5174"],
+       methods: ["GET", "POST"],
+       credentials: true
+     }
+
+═════════════════════════════════════════════════════════════════════════════════
+��� AHORA DEBES HACER EN GOOGLE CONSOLE
+═════════════════════════════════════════════════════════════════════════════════
+
+1. Ve a: https://console.cloud.google.com/
+
+2. Busca tu proyecto (busca el Client ID que usas: 907384023626-dc85nheco1hirprrbouf9cejvs3utekr)
+
+3. Ve a "APIs & Services" → "Credentials"
+
+4. Haz click en tu OAuth 2.0 Client ID
+
+5. En "Authorized JavaScript origins" agrega:
+   ✅ http://localhost:3000
+   ✅ http://localhost:5173
+   ✅ http://localhost:5174
+
+6. En "Authorized redirect URIs" asegúrate que está:
+   ✅ http://localhost:3000/api/auth/google/callback
+
+7. Haz click en SAVE
+
+8. ⏳ ESPERA 5-10 MINUTOS (Google tarda en propagar cambios)
+
+═════════════════════════════════════════════════════════════════════════════════
+��� VERIFICAR QUE TODO ESTÁ BIEN
+═════════════════════════════════════════════════════════════════════════════════
+
+TERMINAL 1 - Backend:
+─────────────────────
+cd backend
+npm run dev
+
+TERMINAL 2 - Frontend:
+──────────────────────
+cd frontend/syncro-chat-front
+npm run dev
+
+NAVEGADOR - http://localhost:5173:
+─────────────────────────────────
+1. Abre DevTools (F12)
+2. Ve a Console tab
+3. Ejecuta:
+
+fetch('http://localhost:3000/api/health')
+  .then(r => r.json())
+  .then(d => console.log("CORS OK:", d))
+  .catch(e => console.error("CORS ERROR:", e))
+
+✅ Si ves "CORS OK: {...}" → CORS funcionando
+❌ Si ves "CORS ERROR:" → Algo sigue mal
+
+═════════════════════════════════════════════════════════════════════════════════
+��� PROBAR LOGIN
+═════════════════════════════════════════════════════════════════════════════════
+
+1. En http://localhost:5173, haz click en "Sign in with Google"
+
+2. Autentica
+
+3. En DevTools Console deberías ver:
+   ✅ "1. Google nos autenticó. Enviando token al backend..."
+   ✅ "2. Backend respondió:" { ... }
+   ✅ Redirige a /chat automáticamente
+
+═════════════════════════════════════════════════════════════════════════════════
+��� DEBUGGING
+═════════════════════════════════════════════════════════════════════════════════
+
+Si SIGUE sin funcionar, ejecuta en Console:
+
+// 1. Verifica que Client ID esté configurado
+console.log("CLIENT_ID:", import.meta.env.VITE_GOOGLE_CLIENT_ID)
+
+// 2. Verifica CORS del backend
+fetch('http://localhost:3000/api/auth/google/login', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ token: 'test' })
+})
+.then(r => r.json())
+.then(d => console.log("Response:", d))
+.catch(e => console.error("Error:", e))
+
+// 3. Abre DevTools → Network tab
+// Busca la request POST /api/auth/google/login
+// Verifica que en Response Headers esté:
+// Access-Control-Allow-Origin: http://localhost:5173 ✅
+
+═════════════════════════════════════════════════════════════════════════════════
+��� ARCHIVOS MODIFICADOS
+═════════════════════════════════════════════════════════════════════════════════
+
+✅ backend/src/index.ts
+   └─ Agregado import cors
+   └─ Agregado middleware app.use(cors(...))
+   └─ Actualizado Socket.IO cors config
+
+��� DOCUMENTACIÓN NUEVA:
+────────────────────
+✅ GOOGLE_OAUTH_CONFIG.md → Guía completa de Google OAuth
+✅ check-config.sh → Script para verificar configuración
+
+═════════════════════════════════════════════════════════════════════════════════
+✨ RESUMEN
+═════════════════════════════════════════════════════════════════════════════════
+
+ANTES:
+  Backend NO tenía CORS → Frontend no podía conectar
+
+AHORA:
+  Backend tiene CORS completo → Frontend puede conectar
+
+FALTA:
+  Autorizar los orígenes en Google Console (ya que cambié la URL del frontend)
+  URL nuevo de frontend: http://localhost:5173 (antes era simulado)
+
+PASOS FINALES:
+  1. Ve a Google Console
+  2. Autoriza localhost:5173
+  3. Espera 10 minutos
+  4. Reinicia Backend y Frontend
+  5. Prueba login
+
+═════════════════════════════════════════════════════════════════════════════════

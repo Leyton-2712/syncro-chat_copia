@@ -1,0 +1,397 @@
+{
+	"info": {
+		"_postman_id": "0e813204-455a-4085-a236-72d18e290baa",
+		"name": "Real Chat",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "49339975",
+		"_collection_link": "https://muruchi2018-1768956.postman.co/workspace/Kleber-Velasco-Muruchi's-Worksp~200d1d42-69bd-4d3a-8d1e-06b0b8fd52a0/collection/49339975-0e813204-455a-4085-a236-72d18e290baa?action=share&source=collection_link&creator=49339975"
+	},
+	"item": [
+		{
+			"name": "chat",
+			"item": [
+				{
+					"name": "crearChat",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJrbGViMjAyNSIsImVtYWlsIjoibXVydWNoaTIwMThAZ21haWwuY29tIiwiaWF0IjoxNzYzMTQwOTgyLCJleHAiOjE3NjMxNDQ1ODJ9.ycNtBVUVoGn76GP7wHf_uOmaTioBl0HXIxhoXQBmNo0",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"prueba\",\r\n    \"isGroupChat\": true,\r\n    \"participantIds\": [1, 2]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/chats",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"chats"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "obtenerChats",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJrbGViMjAyNSIsImVtYWlsIjoibXVydWNoaTIwMThAZ21haWwuY29tIiwiaWF0IjoxNzYzMTQwOTgyLCJleHAiOjE3NjMxNDQ1ODJ9.ycNtBVUVoGn76GP7wHf_uOmaTioBl0HXIxhoXQBmNo0",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/chats",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"chats"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "obtenerChatsId",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJrbGViMjAyNSIsImVtYWlsIjoibXVydWNoaTIwMThAZ21haWwuY29tIiwiaWF0IjoxNzYzMTQwOTgyLCJleHAiOjE3NjMxNDQ1ODJ9.ycNtBVUVoGn76GP7wHf_uOmaTioBl0HXIxhoXQBmNo0",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/chats/1",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"chats",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "actualizarChatId",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJrbGViMjAyNSIsImVtYWlsIjoibXVydWNoaTIwMThAZ21haWwuY29tIiwiaWF0IjoxNzYzMTQwOTgyLCJleHAiOjE3NjMxNDQ1ODJ9.ycNtBVUVoGn76GP7wHf_uOmaTioBl0HXIxhoXQBmNo0",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"prueba2\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/api/chats/1",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"chats",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "eliminar chat",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJrbGViMjAyNSIsImVtYWlsIjoibXVydWNoaTIwMThAZ21haWwuY29tIiwiaWF0IjoxNzYzMTQwOTgyLCJleHAiOjE3NjMxNDQ1ODJ9.ycNtBVUVoGn76GP7wHf_uOmaTioBl0HXIxhoXQBmNo0",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/api/chats/1",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"chats",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "agregarParticipante",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/api/chats/1/participants",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"chats",
+								"1",
+								"participants"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "auth",
+			"item": [
+				{
+					"name": "login",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"muruchi2018@gmail.com\",\r\n    \"password\": \"1010\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/auth/login",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "registro",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/api/auth/registro",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"registro"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "message",
+			"item": [
+				{
+					"name": "crearMensaje",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/messages",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"messages"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "obtenerMensajesChat",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/chats/:chatId/messages",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"chats",
+								":chatId",
+								"messages"
+							],
+							"variable": [
+								{
+									"key": "chatId",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "obtenerMensajeId",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/messages/:messageId",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"messages",
+								":messageId"
+							],
+							"variable": [
+								{
+									"key": "messageId",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "actualizarMensajeId",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/messages/:messageId",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"messages",
+								":messageId"
+							],
+							"variable": [
+								{
+									"key": "messageId",
+									"value": ""
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "eliminarMensajeId",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/messages/:messageId",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"messages",
+								":messageId"
+							],
+							"variable": [
+								{
+									"key": "messageId",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "heltcheck",
+			"item": [
+				{
+					"name": "hellhCheck",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/healthCheck",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"healthCheck"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "New Request",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		}
+	]
+}

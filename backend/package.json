@@ -1,0 +1,50 @@
+{
+  "name": "realchat",
+  "version": "1.0.0",
+  "description": "Aplicacion web de mensajeria en tiempo real que permite a los usuarios comunicarse instantaneamente ",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon src/index.ts",
+    "build": "tsc && copyfiles -u 1 \"src/public/**/*\" dist",
+    "start": "node dist/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "grupo 13",
+  "license": "ISC",
+  "type": "commonjs",
+  "devDependencies": {
+    "@types/bcrypt": "^6.0.0",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.5",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/node": "^24.10.0",
+    "@types/nodemailer": "^7.0.3",
+    "@types/passport": "^1.0.17",
+    "@types/passport-google-oauth20": "^2.0.17",
+    "axios": "^1.13.2",
+    "body-parser": "^2.2.0",
+    "copyfiles": "^2.4.1",
+    "nodemon": "^3.1.10",
+    "prisma": "^6.19.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.19.0",
+    "@types/socket.io": "^3.0.1",
+    "bcrypt": "^6.0.0",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.14.2",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "express": "^5.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "jwt-decode": "^4.0.0",
+    "nodemailer": "^7.0.10",
+    "passport": "^0.7.0",
+    "passport-google-oauth20": "^2.0.0",
+    "socket.io": "^4.8.1",
+    "static": "^2.0.0"
+  }
+}

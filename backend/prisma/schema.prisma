@@ -1,0 +1,78 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client"
+  output = "../src/generated/client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id              Int      @id @default(autoincrement())
+  username        String   @unique
+  email           String   @unique
+  password        String?
+  validadoDia     DateTime?
+
+
+  messages        Message[]           @relation("MessageSender")
+  pinnedMessages  PinnedMessage[]     @relation("PinnedByUser")
+  chats           ChatParticipant[]
+}
+
+model Chat {
+  id            Int      @id @default(autoincrement())
+  name          String?  
+  isGroupChat   Boolean  @default(false)
+  
+  participants    ChatParticipant[]
+  messages        Message[]
+  pinnedMessages  PinnedMessage[]
+}
+
+model ChatParticipant {
+  id        Int     @id @default(autoincrement())
+  isPinned  Boolean @default(false)
+  
+  userId    Int
+  chatId    Int
+  user      User    @relation(fields: [userId], references: [id])
+  chat      Chat    @relation(fields: [chatId], references: [id])
+  
+  @@unique([userId, chatId])
+}
+
+
+model Message {
+  id          Int      @id @default(autoincrement())
+  content     String   @db.Text 
+  messageType String   @default("text") 
+  createdAt   DateTime @default(now())
+  
+  
+  senderId    Int
+  chatId      Int
+  sender      User     @relation("MessageSender", fields: [senderId], references: [id])
+  chat        Chat     @relation(fields: [chatId], references: [id])
+  pinnedEntry PinnedMessage? 
+}
+
+model PinnedMessage {
+  id            Int       @id @default(autoincrement())
+  expiresAt     DateTime? 
+  
+  messageId     Int       @unique 
+  chatId        Int
+  pinnedByUserId Int
+  
+  message       Message   @relation(fields: [messageId], references: [id])
+  chat          Chat      @relation(fields: [chatId], references: [id])
+  pinnedByUser  User      @relation("PinnedByUser", fields: [pinnedByUserId], references: [id])
+}

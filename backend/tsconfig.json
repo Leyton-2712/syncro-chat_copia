@@ -1,0 +1,45 @@
+{
+  "compilerOptions": {
+    // File Layout
+    "rootDir": "./src",
+    "outDir": "./dist",
+    "baseUrl": ".",
+
+    // Module Resolution
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "moduleDetection": "force",
+    "esModuleInterop": true,
+    "isolatedModules": true,
+    "verbatimModuleSyntax": false,
+    "allowSyntheticDefaultImports": true,
+    "paths": {
+      "@/*": ["src/*"]
+    },
+
+    // Type Checking
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+    "noUncheckedSideEffectImports": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+
+    // Output
+    "target": "ES2020",
+    "sourceMap": true,
+    "declaration": true,
+    "declarationMap": true,
+
+    // Type Definitions
+    "types": ["node"],
+    "typeRoots": ["./node_modules/@types"],
+
+    // validacion
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true
+
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules"]
+}

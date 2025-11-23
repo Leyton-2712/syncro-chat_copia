@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RealChat - Home</title>
+</head>
+<body>
+    <h1>RealChat - Mis Chats</h1>
+    <p>Usuario: <span id="username"></span> | <button onclick="logout()">Cerrar Sesion</button></p>
+    <hr>
+    
+    <h2>Crear Nuevo Chat</h2>
+    <form id="createChatForm">
+        <label>Nombre del chat (opcional):</label><br>
+        <input type="text" id="chatName" placeholder="Ej: Grupo de trabajo"><br><br>
+        
+        <label>IDs de participantes (separados por coma):</label><br>
+        <input type="text" id="participantIds" placeholder="Ej: 2,3,4" required><br><br>
+        
+        <label>
+            <input type="checkbox" id="isGroup">
+            ¿Es un grupo?
+        </label><br><br>
+        
+        <button type="submit">Crear Chat</button>
+    </form>
+    
+    <hr>
+    <h2>Mis Chats</h2>
+    <button onclick="loadChats()">Actualizar Lista</button>
+    <div id="chatsList"></div>
+    
+    <hr>
+    <div id="mensajes"></div>
+    
+    <script>
+        const token = localStorage.getItem('token');
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+        
+        if (!token) {
+            window.location.href = '/index.html';
+        }
+        
+        document.getElementById('username').textContent = user.username || user.email;
+        
+        function logout() {
+            localStorage.clear();
+            window.location.href = '/index.html';
+        }
+        
+        // crear chat
+        document.getElementById('createChatForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const chatName = document.getElementById('chatName').value;
+            const participantIds = document.getElementById('participantIds').value
+                .split(',')
+                .map(id => parseInt(id.trim()))
+                .filter(id => !isNaN(id));
+            const isGroupChat = document.getElementById('isGroup').checked;
+            
+            try {
+                const response = await fetch('/api/chats', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        name: chatName || null,
+                        participantIds: participantIds,
+                        isGroupChat: isGroupChat
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.status === 201) {
+                    document.getElementById('mensajes').innerHTML = '<p style="color: green;">✓ Chat creado exitosamente!</p>';
+                    document.getElementById('createChatForm').reset();
+                    loadChats();
+                } else {
+                    document.getElementById('mensajes').innerHTML = `<p style="color: red;">✗ Error: ${data.message}</p>`;
+                }
+            } catch (error) {
+                document.getElementById('mensajes').innerHTML = `<p style="color: red;">✗ Error: ${error.message}</p>`;
+                console.error('Error:', error);
+            }
+        });
+        
+        // cargar chats
+        async function loadChats() {
+            try {
+                const response = await fetch('/api/chats', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (data.status === 200) {
+                    const chatsList = document.getElementById('chatsList');
+                    
+                    if (data.data.length === 0) {
+                        chatsList.innerHTML = '<p>No tienes chats todavía.</p>';
+                    } else {
+                        let html = '<ul>';
+                        data.data.forEach(chat => {
+                            const chatName = chat.name || `Chat ${chat.id}`;
+                            const participantCount = chat.participants.length;
+                            const lastMessage = chat.messages && chat.messages.length > 0 
+                                ? chat.messages[0].content.substring(0, 30) + '...'
+                                : 'Sin mensajes';
+                            
+                            html += `
+                                <li>
+                                    <strong>${chatName}</strong> 
+                                    (${chat.isGroupChat ? 'Grupo' : 'Individual'}) - 
+                                    ${participantCount} participantes
+                                    <br>
+                                    <small>${lastMessage}</small>
+                                    <br>
+                                    <a href="/chat.html?chatId=${chat.id}">Abrir Chat</a>
+                                </li>
+                                <br>
+                            `;
+                        });
+                        html += '</ul>';
+                        chatsList.innerHTML = html;
+                    }
+                } else {
+                    document.getElementById('chatsList').innerHTML = `<p style="color: red;">Error al cargar chats</p>`;
+                }
+            } catch (error) {
+                document.getElementById('chatsList').innerHTML = `<p style="color: red;">Error: ${error.message}</p>`;
+                console.error('Error:', error);
+            }
+        }
+        
+        // cargar chats al iniciar
+        loadChats();
+    </script>
+</body>
+</html>

@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RealChat - Login</title>
+</head>
+<body>
+    <h1 style="text-align: center;">RealChat - iniciar sesion</h1>
+    <hr>
+    
+    <form id="loginForm" style="text-align: center;">
+        <h2>Inicio de sesion con correo</h2>
+        <label>Correo:</label><br>
+        <input type="email" placeholder="email@ejemplo.com" id="email" required><br><br>
+        
+        <label>Contraseña:</label><br>
+        <input type="password" placeholder="Password" id="password" required><br><br>
+        
+        <button type="submit">Iniciar sesion</button>
+    </form>
+    
+    <br>
+    <p style="text-align: center;">No tienes cuenta ? <a href="/register.html" style="color: black; text-decoration: none;">Registrate</a></p>
+    
+    <hr>
+    <div style="text-align: center;">
+        <h3>O inicia sesion con</h3>
+        <button id="googleBtn" >Google</button>
+    </div>
+    
+    <hr>
+    <div id="mensajes"></div>
+    
+    <script>
+        const loginForm = document.getElementById('loginForm');
+        const mensajes = document.getElementById('mensajes');
+        
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            mensajes.innerHTML = '<p>esperando...</p>';
+            
+            try {
+                const response = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+                
+                const data = await response.json();
+                
+                //si todo salio bien
+                if (data.status === 200) {
+                    mensajes.innerHTML = '<p style="color: green;">Inicio de sesion exitoso</p>';
+                    
+                    // guardar token
+                    localStorage.setItem('token', data.data.token);
+                    localStorage.setItem('user', JSON.stringify(data.data.user));
+                    
+                    // redirigir a home
+                    setTimeout(() => {
+                        window.location.href = '/home.html';
+                    }, 1000);
+                } else {
+                    mensajes.innerHTML = `<p style="color: red;">Error al iniciar sesion</p>`;
+                }
+            } catch (error) {
+                mensajes.innerHTML = `<p style="color: red;">Error al iniciar sesion</p>`;
+                console.error('Error:', error);
+            }
+        });
+        
+        document.getElementById('googleBtn').addEventListener('click', () => {
+            window.location.href = '/api/auth/google';
+        });
+    </script>
+</body>
+</html>

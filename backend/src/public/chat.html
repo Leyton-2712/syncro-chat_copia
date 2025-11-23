@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RealChat - Chat</title>
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+</head>
+<body>
+    <h1>RealChat - Chat</h1>
+    <p><a href="/home.html">← Volver a Mis Chats</a> | Usuario: <span id="username"></span></p>
+    <hr>
+    
+    <h2>Chat: <span id="chatName">Cargando...</span></h2>
+    <p id="chatInfo"></p>
+    
+    <hr>
+    <h3>Mensajes</h3>
+    <div id="connectionStatus" style="background: yellow; padding: 10px;"></div>
+    <div id="typingIndicator" style="font-style: italic; color: gray;"></div>
+    
+    <div id="messagesContainer" style="border: 1px solid #ccc; padding: 10px; height: 300px; overflow-y: scroll;">
+        <p>Cargando mensajes...</p>
+    </div>
+    
+    <hr>
+    <h3>Enviar Mensaje</h3>
+    <form id="messageForm">
+        <textarea id="messageInput" rows="3" cols="50" placeholder="Escribe tu mensaje..." required></textarea><br><br>
+        <button type="submit">Enviar</button>
+    </form>
+    
+    <hr>
+    <div id="mensajes"></div>
+    
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const chatId = parseInt(urlParams.get('chatId'));
+        const token = localStorage.getItem('token');
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+        
+        if (!token || !chatId) {
+            window.location.href = '/home.html';
+        }
+        
+        document.getElementById('username').textContent = user.username || user.email;
+        
+        let socket;
+        let isTyping = false;
+        let typingTimeout;
+        
+        // conectar socket.io
+        function connectSocket() {
+            socket = io({
+                auth: {
+                    token: token
+                }
+            });
+            
+            socket.on('connect', () => {
+                document.getElementById('connectionStatus').innerHTML = '✓ Conectado al servidor';
+                document.getElementById('connectionStatus').style.background = 'lightgreen';
+                
+                // unirse al chat
+                socket.emit('join_chat', chatId);
+            });
+            
+            socket.on('disconnect', () => {
+                document.getElementById('connectionStatus').innerHTML = '✗ Desconectado del servidor';
+                document.getElementById('connectionStatus').style.background = 'pink';
+            });
+            
+            socket.on('joined_chat', (data) => {
+                console.log('Unido al chat:', data);
+                loadChatInfo();
+                loadMessages();
+            });
+            
+            socket.on('new_message', (message) => {
+                console.log('Nuevo mensaje:', message);
+                addMessageToUI(message);
+            });
+            
+            socket.on('user_joined', (data) => {
+                document.getElementById('mensajes').innerHTML = `<p style="color: blue;">${data.username} se unió al chat</p>`;
+            });
+            
+            socket.on('user_left', (data) => {
+                document.getElementById('mensajes').innerHTML = `<p style="color: gray;">${data.username} salió del chat</p>`;
+            });
+            
+            socket.on('user_typing', (data) => {
+                if (data.userId !== user.id) {
+                    document.getElementById('typingIndicator').textContent = `${data.username} está escribiendo...`;
+                    
+                    setTimeout(() => {
+                        document.getElementById('typingIndicator').textContent = '';
+                    }, 3000);
+                }
+            });
+            
+            socket.on('message_updated', (message) => {
+                console.log('Mensaje actualizado:', message);
+                loadMessages();
+            });
+            
+            socket.on('message_deleted', (data) => {
+                console.log('Mensaje eliminado:', data);
+                loadMessages();
+            });
+            
+            socket.on('error', (data) => {
+                document.getElementById('mensajes').innerHTML = `<p style="color: red;">Error: ${data.message}</p>`;
+            });
+        }
+        
+        // cargar información del chat
+        async function loadChatInfo() {
+            try {
+                const response = await fetch(`/api/chats/${chatId}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (data.status === 200) {
+                    const chat = data.data;
+                    document.getElementById('chatName').textContent = chat.name || `Chat ${chat.id}`;
+                    
+                    const participants = chat.participants
+                        .map(p => p.user.username)
+                        .join(', ');
+                    
+                    document.getElementById('chatInfo').textContent = 
+                        `Tipo: ${chat.isGroupChat ? 'Grupo' : 'Individual'} | Participantes: ${participants}`;
+                }
+            } catch (error) {
+                console.error('Error al cargar info del chat:', error);
+            }
+        }
+        
+        // cargar mensajes
+        function loadMessages() {
+            socket.emit('get_messages', chatId);
+            
+            socket.once('messages_loaded', (messages) => {
+                const container = document.getElementById('messagesContainer');
+                
+                if (messages.length === 0) {
+                    container.innerHTML = '<p>No hay mensajes todavía. ¡Sé el primero en escribir!</p>';
+                } else {
+                    container.innerHTML = '';
+                    messages.forEach(message => {
+                        addMessageToUI(message);
+                    });
+                    
+                    // scroll al final
+                    container.scrollTop = container.scrollHeight;
+                }
+            });
+        }
+        
+        // agregar mensaje a la UI
+        function addMessageToUI(message) {
+            const container = document.getElementById('messagesContainer');
+            const isMyMessage = message.senderId === user.id;
+            
+            const messageDiv = document.createElement('div');
+            messageDiv.style.marginBottom = '10px';
+            messageDiv.style.padding = '5px';
+            messageDiv.style.background = isMyMessage ? '#e3f2fd' : '#f5f5f5';
+            messageDiv.style.border = '1px solid #ddd';
+            
+            const time = new Date(message.createdAt).toLocaleString();
+            
+            messageDiv.innerHTML = `
+                <strong>${message.sender?.username || 'Usuario'}</strong> 
+                <small>(${time})</small>
+                <br>
+                ${message.content}
+            `;
+            
+            container.appendChild(messageDiv);
+            container.scrollTop = container.scrollHeight;
+        }
+        
+        // enviar mensaje
+        document.getElementById('messageForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const content = document.getElementById('messageInput').value.trim();
+            
+            if (content) {
+                socket.emit('send_message', {
+                    chatId: chatId,
+                    content: content
+                });
+                
+                document.getElementById('messageInput').value = '';
+                
+                // detener indicador de escritura
+                if (isTyping) {
+                    socket.emit('typing', { chatId: chatId, isTyping: false });
+                    isTyping = false;
+                }
+            }
+        });
+        
+        // indicador de escritura
+        document.getElementById('messageInput').addEventListener('input', () => {
+            if (!isTyping) {
+                isTyping = true;
+                socket.emit('typing', { chatId: chatId, isTyping: true });
+            }
+            
+            clearTimeout(typingTimeout);
+            typingTimeout = setTimeout(() => {
+                isTyping = false;
+                socket.emit('typing', { chatId: chatId, isTyping: false });
+            }, 2000);
+        });
+        
+        // inicializar
+        connectSocket();
+    </script>
+</body>
+</html>
