@@ -1,6 +1,9 @@
 import { useEffect, useRef, useCallback, useState } from "react";
 import { io, Socket } from "socket.io-client";
 
+// ✅ AGREGAR: Leer URL del backend desde variables de entorno
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+
 interface UseSocketProps {
     token?: string;
 }
@@ -57,8 +60,11 @@ export function useSocket({ token }: UseSocketProps) {
     useEffect(() => {
         if (!token) return;
 
-        // Conectar a WebSocket
-        socketRef.current = io("http://localhost:3000", {
+        // ✅ AGREGAR: Log para debug
+        console.log("🔌 Conectando a WebSocket:", API_URL);
+
+        // ✅ CAMBIAR: Usar variable de entorno
+        socketRef.current = io(API_URL, {
             auth: {
                 token: token
             },

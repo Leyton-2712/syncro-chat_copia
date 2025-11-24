@@ -7,6 +7,9 @@ import RoutesConfig from "./routes/Routes"
 import { useNavigate } from "react-router-dom"
 import type { CredentialResponse } from "@react-oauth/google"
 
+// ✅ AGREGAR: Leer URL del backend desde variables de entorno
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+
 function App() {
 
   const navigate = useNavigate();
@@ -39,11 +42,12 @@ function App() {
     if (credentialResponse.credential) {
       const tokenGoogle = credentialResponse.credential;
       console.log("1. Google nos autenticó. Enviando token al backend...");
+      console.log("📡 API URL:", API_URL); // ✅ AGREGAR: Para debug
       
       setLoading(true);
       try {
-        // Enviamos el token al backend
-        const response = await fetch("http://localhost:3000/api/auth/google/login", {
+        // ✅ CAMBIAR: Usar variable de entorno en lugar de URL hardcodeada
+        const response = await fetch(`${API_URL}/api/auth/google/login`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
