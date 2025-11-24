@@ -8,7 +8,7 @@ import { useNavigate } from "react-router-dom"
 import type { CredentialResponse } from "@react-oauth/google"
 
 // ✅ AGREGAR: Leer URL del backend desde variables de entorno
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+const API_URL = import.meta.env.VITE_API_URL;
 
 function App() {
 
