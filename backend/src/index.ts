@@ -51,7 +51,8 @@ const start = async () => {
                     "http://localhost:3000",
                     "http://localhost:5173",
                     "http://localhost:5174",
-                    "https://syncro-chatcopia-production.up.railway.app"  // ✅ Agregado para Railway
+                    "https://syncro-chatcopia-production.up.railway.app",
+                    "https://syncro-chat-front.vercel.app"  // ✅ AGREGAR ESTO
                 ],
                 methods: ["GET", "POST"],
                 credentials: true
@@ -65,8 +66,8 @@ const start = async () => {
                 "http://localhost:3000",
                 "http://localhost:5173",
                 "http://localhost:5174",
-                "https://syncro-chatcopia-production.up.railway.app"  // ✅ Agregado para Railway
-                // Agregarás el dominio de Vercel después
+                "https://syncro-chatcopia-production.up.railway.app",
+                "https://syncro-chat-front.vercel.app"  // ✅ AGREGAR ESTO
             ],
             methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
             credentials: true,
