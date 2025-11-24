@@ -7,7 +7,7 @@ import routes from "./routes/route";
 import bodyParser from "body-parser";
 import cors from "cors";
 import "./config/passport.config";
-import { configurarSocketIO } from "../src/sockets/socket.handler";
+import { configurarSocketIO } from "./sockets/socket.handler";  // ✅ Cambiado
 import path from "path";
 import prisma from "./db/prisma";
 
@@ -47,7 +47,12 @@ const start = async () => {
         const httpServer = createServer(app);
         const io = new Server(httpServer, {
             cors: {
-                origin: ["http://localhost:3000", "http://localhost:5173", "http://localhost:5174"],
+                origin: [
+                    "http://localhost:3000",
+                    "http://localhost:5173",
+                    "http://localhost:5174",
+                    "https://syncro-chatcopia-production.up.railway.app"  // ✅ Agregado para Railway
+                ],
                 methods: ["GET", "POST"],
                 credentials: true
             }
@@ -56,7 +61,13 @@ const start = async () => {
         
         // middlewares
         app.use(cors({
-            origin: ["http://localhost:3000", "http://localhost:5173", "http://localhost:5174"],
+            origin: [
+                "http://localhost:3000",
+                "http://localhost:5173",
+                "http://localhost:5174",
+                "https://syncro-chatcopia-production.up.railway.app"  // ✅ Agregado para Railway
+                // Agregarás el dominio de Vercel después
+            ],
             methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
             credentials: true,
             allowedHeaders: ["Content-Type", "Authorization"]
@@ -66,14 +77,12 @@ const start = async () => {
 
         // rutas
         app.use("/", routes);
-        
-        
 
         // configurar socket.io
         configurarSocketIO(io);
         
         // guardar instancia de io para usar en otros archivos
-        const { setIOInstance } = await import("../src/sockets/socket.handler");
+        const { setIOInstance } = await import("./sockets/socket.handler");  // ✅ Cambiado
         setIOInstance(io);
         
         httpServer.listen(puerto, () => {
